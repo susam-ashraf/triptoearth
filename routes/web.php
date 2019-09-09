@@ -1,0 +1,66 @@
+<?php
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+
+/*
+Route::get('/', function () {
+    return view('create_trip.create_trip');
+});
+*/
+Auth::routes();
+
+Route::get('/', 'HomeController@index');
+
+
+Route::get('/meet-up', 'HomeController@meet_up');
+Route::post('/search-all-meet-up', 'HomeController@meet_up_search')->name('user_search_meet_up');
+
+Route::get('/find-a-travel-buddy', 'HomeController@find_a_travel_buddy');
+Route::post('/find-a-travel-buddy-search', 'HomeController@find_a_travel_buddy_search')->name('find-a-travel-buddy');;
+
+Route::get('/all-travelers', 'HomeController@all_travelers');
+Route::post('/search-all', 'HomeController@search_all')->name('user_search');
+
+
+
+Route::post('/upload-image/', 'CreateTrip@upload_image_user')->name('Upload_user_image');
+
+
+
+Route::get('/new-trips', 'HomeController@find_new_trip')->name('show-trips');
+
+
+
+
+Route::get('/create', 'CreateTrip@index')->name('create-trips');
+Route::post('/store-trips', 'CreateTrip@store')->name('store-trips');
+Route::get('/home', 'CreateTrip@home')->name('home');
+Route::get('/show', 'CreateTrip@show');
+
+Route::get('/my-profile/{id}', 'CreateTrip@myprofile');
+
+Route::get('/travel-blog', 'TravelBlog@index')->name('blog');
+
+
+Route::post('images-upload', 'upload@imagesUploadPost')->name('images.upload');
+
+
+Route::post('change-password', 'UserController@changePassword')->name('user.password');
+
+
+Route::post('update-profile', 'UserController@UpdateProfile')->name('user.profile');
+
+
+
+Route::get('/upload', function () {
+    return view('profile.image');
+});

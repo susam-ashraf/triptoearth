@@ -1,0 +1,920 @@
+/*
+ *      project:  TripGiraffe.cz
+ *      package:  Frontend
+ *      description:  TripGiraffe website jQuery functions.
+ *     file version:  1.0
+ */
+
+function showPopUp(container) {
+    $.magnificPopup.open({
+        items: {
+            src: container
+        },
+        type: 'inline',
+        closeOnBgClick: false,
+        preloader: false,
+        fixedContentPos: false,
+        removalDelay: 300,
+        mainClass: 'mfp-fade',
+        callbacks: {
+            open: function () {
+            },
+            close: function () {
+            },
+            beforeOpen: function () {
+            }
+        }
+    }, 0);
+}
+
+function alertModal(_config) {
+    var config = $.extend({
+        "title": "",
+        "message": "",
+        "modal": false
+    }, _config);
+
+    if (!config.modal) {
+        config.modal = $('<div class="popup-confirm">' +
+            '<p class="title text-center">' + config.title + '</p>' +
+            '<div class="form-holder">' +
+            '<p>' +
+            config.message +
+            '</p>' +
+            '<div class="mfp-close"><p>close</p><i class="web-icon close-black"></i></div>' +
+            '</div>' +
+            '</div>');
+    }
+
+    showPopUp(config.modal);
+
+    return config;
+}
+
+$(document).ready(function () {
+
+    /*Tools*/
+    getCurrentPath = function () {
+        return (window.location.href.substr(0, window.location.href.lastIndexOf("/")));
+    }
+
+    if (typeof basepath !== 'undefined') {
+        // basepath exist
+    } else {
+        //var basepath = getCurrentPath() + "/rand/";
+        //var basepath = getCurrentPath();
+    }
+
+
+    /*Home slider*/
+    if ($('#slider-home').length) {
+        initMainBanner();
+
+        $(window).resize(function () {
+            initMainBanner();
+        });
+    }
+
+
+    /*Notify init*/
+    $.notifyDefaults({
+        type: 'warning',
+        mouse_over: 'pause',
+        allow_dismiss: true,
+        newest_on_top: true,
+        allow_duplicates: false,
+        position: null,
+        z_index: 10000,
+        placement: {
+            from: "top",
+            align: "center"
+        },
+        offset: {
+            x: 0,
+            y: 150
+        },
+        animate: {
+            enter: 'animated fadeInDown',
+            exit: 'animated fadeOutUp'
+        },
+        delay: 2000
+    });
+
+
+    /*Banner image*/
+    if ($('.header-banner').length) {
+        $('.header-banner').css('background-image', 'url(' + $('.header-banner').attr('data-image') + ')');
+    }
+
+
+    /*Back to top*/
+    /*$(".back-top").hide();    //in case of page floating
+     $(window).scroll(function () {
+     if ($(this).scrollTop() > 300) {
+     $('.back-top').fadeIn();
+     } else {
+     $('.back-top').fadeOut();
+     }
+     });*/
+
+    $('.back-top a, .scroll-top a').click(function () {
+        $('body,html').animate({
+            scrollTop: 0
+        }, 500);
+        return false;
+    });
+
+
+    /*Registration steps*/
+    if ($('.registration').length) {
+
+        $('.carousel').carousel({interval: false})
+
+        $('a.register-next').on('click', function (e) {
+            //e.preventDefault();
+            if(checkRegistrationPart1(e)){
+                $('.carousel').carousel('next');                
+            }
+        });
+
+        $('.registration form').on('keyup keypress', function(e) {
+            var keyCode = e.keyCode || e.which;
+            if (keyCode === 13 && $('.step-one').hasClass('active')) {
+                e.preventDefault();
+                $('a.register-next').click();
+                return false;
+            }
+        });
+
+        $('.carousel').on('slide.bs.carousel', function () {
+            if ($('.step-one').hasClass('active')) {
+                var elem_to_show = $('.step-two');
+                var elem_to_hide = $('.step-one,.text-footer');
+            } else {
+                var elem_to_show = $('.step-one,.text-footer');
+                var elem_to_hide = $('.step-two');
+            }
+
+            elem_to_hide.stop().animate({opacity: '0'}, {
+                duration: 500,
+                complete: function () {
+                    $(this).removeClass('active');
+                }
+            });
+
+            elem_to_show.stop().animate({opacity: '1'}, {
+                duration: 500,
+                complete: function () {
+                    $(this).addClass('active');
+                }
+            });
+        });
+
+    }
+
+
+    /*Selectpicker init*/
+    if ($('select.selectpicker').length) {
+        $('select.selectpicker').selectpicker({
+            size: 10,
+            selectedTextFormat: 'count > 4',
+            template: {
+                caret: '<i class="fa fa-angle-down"></i>'
+            }
+        });
+    }
+
+
+
+    /*Daterangetpicker init*/
+    calendar_local = {
+        format: 'DD/MM/YYYY',
+        //separator: " / ",
+        applyLabel: 'Select',
+        cancelLabel: 'Cancel',
+        fromLabel: "From",
+        toLabel: "To",
+        weekLabel: "Week",
+        customRangeLabel: "Custom",
+        daysOfWeek: [
+            "Su",
+            "Mo",
+            "Tu",
+            "We",
+            "Th",
+            "Fi",
+            "Sa"
+        ],
+        monthNames: [
+            "Janury",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December"
+        ],
+        firstDay: 1
+    };
+
+    if ($('input.datepicker').length) {
+        $('input.datepicker').daterangepicker(
+                {
+                    opens: 'left',
+                    //showWeekNumbers: true,
+                    singleDatePicker: true,
+                    timePicker: false,
+                    timePicker24Hour: true,
+                    locale: calendar_local,
+                    //startDate: '2013-01-01',
+                    //endDate: '2013-12-31'
+                },
+                function (start, end, label) {
+                    //console.log("Novy zvoleny datum: " + start.format('DD-MM-YYYY') + ' to ' + end.format('DD-MM-YYYY'));
+                    //console.log("Novy zvoleny cas: " + start.format('HH:mm'));
+                });
+    }
+
+    $('input.datepicker').on('showCalendar.daterangepicker', function (ev, picker) {
+        //$('.calendar-time i.fa-clock-o').css('display','block');
+    });
+
+    $(document).on('click', 'button.datepicker', function () {
+        $(this).prev('input').focus();
+    });
+
+
+    /*Tabs init*/
+    if ($('.cd-tabs').length) {
+        $('.cd-tabs').each(function () {
+            var tabItems = $(this).find('ul.cd-tabs-navigation a'),
+                    tabContentWrapper = $(this).find('.cd-tabs-content'),
+                    tabItemsOuter = $('.cd-tabs-content-outer').find('.cd-item-outer'),
+                    tabContentWrapperOuter = $('.cd-tabs-content-outer');
+
+            tabItems.on('click', function (event) {
+                event.preventDefault();
+                var selectedItem = $(this);
+
+                if (!selectedItem.hasClass('selected')) {
+
+                    var selectedTab = selectedItem.data('content'),
+                            selectedContent = tabContentWrapper.find('.cd-item[data-content="' + selectedTab + '"]'),
+                            selectedContentHeight = selectedContent.innerHeight();
+
+                    tabItems.removeClass('selected');
+                    selectedItem.addClass('selected');
+                    selectedContent.addClass('selected').siblings('.cd-item').removeClass('selected');
+                    tabContentWrapper.animate({
+                        'height': selectedContentHeight
+                    }, 200);
+
+
+                    var selectedContentOuter = tabContentWrapperOuter.find('.cd-item-outer[data-content="' + selectedTab + '"]');
+                    tabItemsOuter.removeClass('selected');
+                    selectedContentOuter.addClass('selected');
+
+                    console.log(selectedItem);
+                    console.log(selectedTab);
+                    insertParam('selectedTab', selectedTab.replace("tab0", ""));
+                }
+
+            });
+
+            //hide the .cd-tabs::after element when tabbed navigation has scrolled to the end (mobile version)
+            checkScrolling($('.cd-tabs .nav'));
+            $(window).on('resize', function () {
+                checkScrolling($('.cd-tabs .nav'));
+                tabContentWrapper.css('height', 'auto');
+            });
+            $('.cd-tabs .nav').on('scroll', function () {
+                checkScrolling($(this));
+            });
+
+            function checkScrolling(tabs) {
+                var totalTabWidth = parseInt(tabs.children('.cd-tabs-navigation').width()),
+                        tabsViewport = parseInt(tabs.width());
+                if (tabs.scrollLeft() >= totalTabWidth - tabsViewport) {
+                    tabs.parent('.cd-tabs').addClass('is-ended');
+                } else {
+                    tabs.parent('.cd-tabs').removeClass('is-ended');
+                }
+            }
+
+        });
+
+        $('.cd-tabs-nested').each(function () {
+            var tabItems = $(this).find('ul.cd-tabs-navigation-nested a');
+            var tabContentWrapper = $(this).find('.cd-tabs-content-nested');
+
+            tabItems.on('click', function (event) {
+                event.preventDefault();
+                var selectedItem = $(this);
+
+                if (!selectedItem.hasClass('selected')) {
+
+                    var selectedTab = selectedItem.data('content'),
+                            selectedContent = tabContentWrapper.find('.cd-item-nested[data-content="' + selectedTab + '"]'),
+                            selectedContentHeight = selectedContent.innerHeight();
+
+                    tabItems.removeClass('selected');
+                    selectedItem.addClass('selected');
+                    selectedContent.addClass('selected').siblings('.cd-item-nested').removeClass('selected');
+
+                    /*tabContentWrapper.animate({           
+                     'height': selectedContentHeight
+                     }, 200);*/
+
+                    var overall_content = $(this).closest('.cd-tabs-content');
+                    overall_content.animate({
+                        'height': selectedContentHeight + 250    //padding from bottom
+                    }, 200);
+
+                }
+
+            });
+
+            //hide the .cd-tabs::after element when tabbed navigation has scrolled to the end (mobile version)
+            checkScrolling($('.cd-tabs-nested .nav-nested'));
+            $(window).on('resize', function () {
+                checkScrolling($('.cd-tabs-nested .nav-nested'));
+                tabContentWrapper.css('height', 'auto');
+            });
+            $('.cd-tabs-nested .nav-nested').on('scroll', function () {
+                checkScrolling($(this));
+            });
+
+            function checkScrolling(tabs) {
+                var totalTabWidth = parseInt(tabs.children('.cd-tabs-navigation-nested').width()),
+                        tabsViewport = parseInt(tabs.width());
+                if (tabs.scrollLeft() >= totalTabWidth - tabsViewport) {
+                    tabs.parent('.cd-tabs-nested').addClass('is-ended');
+                } else {
+                    tabs.parent('.cd-tabs-nested').removeClass('is-ended');
+                }
+            }
+        });
+
+    }
+
+
+
+    /*Popups mfp*/
+    $(document).on('click', '[data-popup]', function (e) {
+        e.preventDefault();
+        var target = $(this).attr('data-popup');
+        showPopUp($('.popup-content.' + target));
+    });
+
+    $(document).on('click', '.mfp-close', function () {
+        $.magnificPopup.close();
+    });
+
+    /*Gallery images*/
+    $('.gallery-block').not('.edit').magnificPopup({
+        delegate: 'a',
+        type: 'image',
+        tLoading: 'Nahrávám obrázek #%curr%...',
+        closeMarkup: '<div class="mfp-close"><i class="web-icon close-white gal-close"></i></div>',
+        gallery: {
+            enabled: true,
+            navigateByImgClick: true,
+            preload: [0, 1],
+            tCounter: '%curr% z %total%'
+        },
+        image: {
+            tError: '<a href="%url%">Obrázek #%curr%</a> není možné zobrazit.',
+            titleSrc: function (item) {
+                return item.el.attr('title');
+            }
+        }
+    });
+
+    /*Popups*/
+    $(document).on('click', 'a[data-target]', function (e) {
+        e.preventDefault();
+        var target = $(this).attr('data-target');
+        $('.' + target).show();
+    });
+
+    $(document).on('click touch', '.target-close', function () {
+        $(this).closest('.popup').hide();
+    });
+
+    $(".target-close").click(function(){});
+
+
+    /*Upload functions*/
+    if ($('.popup-holder-fileuploader').length) {
+
+        function attachUploadObject(multiple, max_files_allowed) {
+
+            if (multiple == true) {
+                var is_multiple = true;
+                var max_files = max_files_allowed;
+            } else {
+                var is_multiple = false;
+                var max_files = 1;
+            }
+
+            var uploadObj = $('.popup-holder-fileuploader').find("#fileuploader").uploadFile({
+                url: (basepath + '/php/upload.php'),
+                multiple: is_multiple,
+                fileName: "myfile",
+                allowedTypes: "jpg,png,gif",
+                //uploadButtonClass: 'upload-button',
+                showPreview: true,
+                showProgress: true,
+                maxFileCount: max_files,
+                uploadStr: "Insert file",
+                dragDropStr: "<span><b>Drag & Drop</b></span>",
+                multiDragErrorStr: "Hromadné nahrávání není povolené.",
+                maxFileCountErrorStr: " není povolené. Maximální počet souborů je: ",
+                extErrorStr: " není povolené. Povolené typy souborů: ",
+                onSubmit: function (files)
+                {
+                    //console.log(files);
+                },
+                onSuccess: function (files, data, xhr)
+                {
+                    console.log(data);   //response from server
+
+                    var new_image = '<div class="img-holder"><a href="' + basepath + '/../upload/' + files[0] + '" title="' + files[0].substring(0, files[0].indexOf('.')) + '"><img src="' + basepath + '/../upload/' + files[0] + '" alt="' + files[0].substring(0, files[0].indexOf('.')) + '"></a><div class="action-panel"><button type="button" class="btn btn-white"><i class="web-icon notes-pencil type-icon"></i>Edit caption</button><button data-confirm="Are you sure?" type="button" class="btn btn-yellow delete"><i class="fa fa-trash-o type-icon"></i>Delete</button></div></div>';
+
+                    if (multiple == true) {
+
+                        $.ajax({
+                            type: "GET",
+                            url: (getCurrentPath() + '?do=imageGallery'),
+                            data: {'filename': files[0]},
+                            success: function (data, textStatus, jqXHR) {
+                                console.log(data);
+                                var json = jQuery.parseJSON(data);
+                                console.log(json);
+                                new_image = '<div class="img-holder"><a id="image-' + json['image_id'] + '" href="' + json['image_full_path'] + '"><img src="' + json['image_full_path_small'] + '"></a><div class="action-panel"><button type="button" class="btn btn-white edit" onclick="description(' + json['image_id'] + ');"><i class="web-icon notes-pencil type-icon"></i>Edit caption</button><button type="button" class="btn btn-yellow delete"><i class="fa fa-trash-o type-icon"></i>Delete</button></div></div>';
+                                $('.upload-holder.upload-init').append(new_image);
+
+                                $("#description-image-id").val(json['image_id']);
+                                $.magnificPopup.open({
+                                    items: {
+                                        src: '.popup-content.image-description'
+                                    }
+                                }, 0);
+                            }
+                        });
+
+                    } else {
+                        $('.upload-holder.upload-init').children().remove();
+                        $('.upload-holder.upload-init').append(new_image);
+                    }
+
+
+                    var action_type = $('.upload-holder.upload-init').closest('.inner-wrapper').find('button[data-img-type]').data('img-type');
+                    if (action_type == 'profile') {
+                        $('.profile-header .img-holder img').attr('src', basepath + '/../upload/' + files[0]);
+                    } else if (action_type == 'cover') {
+                        //$('.header-banner').attr('data-image',basepath + '/../upload/' + files[0]);
+                        $('.header-banner').attr('style', 'background-image: url("' + basepath + '/../upload/' + files[0] + '")');
+                    }
+
+
+                    if ($('.cd-tabs-content').length) {
+                        var target_container = $('.upload-holder.upload-init').closest('.floating-scroll');
+                        var parent_container = target_container.parent('div');
+                        var tabs_height = target_container.outerHeight();
+                        parent_container.css('height', tabs_height);
+                    }
+
+                    $(window).trigger("resize");
+                }
+            });
+
+            $('.popup-holder-fileuploader').magnificPopup({
+                items: {
+                    src: $('.popup-container-fileuploader'),
+                    type: 'inline'
+                },
+                closeOnBgClick: false,
+                closeMarkup: '<div class="mfp-close"><i class="web-icon close-black"></i></div>',
+                callbacks: {
+                    beforeOpen: function () {
+                        uploadObj.reset();
+                    },
+                    afterClose: function () {
+                        $('.upload-holder').removeClass('upload-init');
+                        $('#fileuploader').children().remove();
+                        $('#fileuploader').next().remove();
+                    }
+                }
+            }).magnificPopup('open');
+
+        }
+
+        $('button.upload').on('click', function () {
+            var max_files_allowed = $(this).closest('.type-upload').find('.upload-holder').attr('data-maxfiles');
+            var current_files_count = $(this).closest('.type-upload').find('.upload-holder').find('.img-holder').length;
+            var multiple = $(this).attr('data-multiple');
+
+            if (current_files_count < parseInt(max_files_allowed)) {
+                if (multiple == 'true') {
+                    attachUploadObject(true, (max_files_allowed - current_files_count));
+                } else {
+                    attachUploadObject(false);
+                }
+
+                $(this).closest('.type-upload').find('.upload-holder').addClass('upload-init');
+
+            } else {
+                if (multiple == 'false') {
+                    attachUploadObject(false);
+                    $(this).closest('.type-upload').find('.upload-holder').addClass('upload-init');
+                } else {
+                    $.notify('Too much files.');
+                }
+            }
+        });
+
+        $('.upload-holder').not('.not-show').magnificPopup({
+            delegate: '.img-holder>a',
+            type: 'image',
+            tLoading: 'Uploading image #%curr%...',
+            closeMarkup: '<div class="mfp-close"><i class="web-icon close-white gal-close"></i></div>',
+            gallery: {
+                enabled: true,
+                navigateByImgClick: true,
+                preload: [0, 1],
+                tCounter: '%curr% z %total%'
+            },
+            image: {
+                tError: '<a href="%url%">Image #%curr%</a> cant be displayed.',
+                titleSrc: function (item) {
+                    return item.el.attr('title');
+                }
+            }
+        });
+
+        /*Delete uploaded image*/
+        $('.upload-holder').on('click', 'button.delete', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var current_el = $(this).closest('.img-holder');
+            var filename_path = current_el.find('img').attr('src');
+            var filename = filename_path.substring(filename_path.lastIndexOf("/") + 1);
+
+            confirmModal({
+                "onSubmit": function (modal) {
+                    //tady smazni obrazku v galerii, ktery nalezi userovi
+                    console.log(filename);
+                    $.ajax({
+                        type: "POST",
+                        url: (getCurrentPath() + '?do=deleteImageGallery'),
+                        data: {'filename': filename},
+                        success: function (data, textStatus, jqXHR) {
+                            //console.log(jqXHR);
+                            //console.log(data);      //returned data
+                            if (jqXHR.status === 200) {   //server response
+                                //$(this).remove();
+                                $(current_el).remove();
+                                var tabs_height = $('.upload-holder').outerHeight();
+                                $('.cd-tabs-content').css('height', tabs_height + 300);
+                                //$.notify('Profilový obrázek změněn.');
+                                $.notify('The picture has been deleted.');
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+    }
+
+
+    $(function () {
+        var $uploadCrop;
+
+        function readFile(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('.upload-demo').addClass('ready');
+                    $uploadCrop.croppie('bind', {
+                        url: e.target.result
+                    }).then(function () {
+                        console.log('jQuery bind complete');
+                    });
+
+                }
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                $.notify("You're browser doesn't support the FileReader API");
+            }
+        }
+
+        $uploadCrop = $('#upload-profile').croppie({
+            viewport: {
+                width: 220,
+                height: 220,
+                type: 'circle'
+            },
+            enableExif: true
+        });
+
+        $('#upload').on('change', function () {
+            readFile(this);
+            $("#upload-result").show();
+        });
+        $('.upload-result').on('click', function (ev) {
+            $uploadCrop.croppie('result', {
+                type: 'canvas',
+                size: 'viewport'
+            }).then(function (resp) {
+
+                $("#profile-image").attr("src", resp);
+                //console.log(resp);
+                $.nette.ajax({
+                    method: 'POST',
+                    url: (getCurrentPath() + '?do=changeProfilePicture'),
+                    data: {
+                        "base64Image": resp.split(',')[1]
+                    },
+                    success: function (data) {
+                        $.notify('Profile picture has been changed.');
+                    }
+                });
+
+            });
+        });
+    });
+
+
+
+
+    //Confirm
+    $(document).on("click", "[data-confirm]", function (e) {
+        var button = $(this);
+
+        if (!button.data("confirmed")) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            confirmModal({
+                "title": button.data("confirm"),
+                "onSubmit": function (modal) {
+                    button.data("confirmed", true);
+                    button[0].click();
+                    button.data("confirmed", false);
+                }
+            });
+
+            return false;
+        }
+
+    });
+
+
+    function confirmModal(_config) {
+        var config = $.extend({
+            "title": "Are you sure?",
+            "modal": false,
+            "btnYes": "Yes",
+            "onSubmit": function (config) {},
+            "btnNo": "No"
+        }, _config);
+
+        if (!config.modal) {
+            config.modal = $('<div class="popup-confirm">' +
+                    '<p class="title text-center">' + config.title + '</p>' +
+                    '<div class="form-holder">' +
+                    '<div class="confirm">' +
+                    '<div class="confirm-button">' +
+                    '<button type="submit" class="btn btn-yellow">' + config.btnYes + '</button>' +
+                    '</div>' +
+                    '<div class="confirm-button">' +
+                    '<button type="submit" class="btn btn-white-bordered">' + config.btnNo + '</button>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div class="mfp-close"><p>close</p><i class="web-icon close-black"></i></div>' +
+                    '</div>' +
+                    '</div>');
+        }
+
+        config.modal.find(".btn-yellow").click(function () {
+            config.modal.find(".mfp-close").trigger("click");
+            if (typeof config.onSubmit === "function") {
+                config.onSubmit(config);
+            }
+        });
+
+        config.modal.find(".btn-white-bordered").click(function () {
+            config.modal.find(".mfp-close").trigger("click");
+        });
+
+        showPopUp(config.modal);
+
+        return config;
+    }
+
+    //Input disable writing
+    $(document).on("keydown", '.datepicker[placeholder="dd/mm/rr"]', function(e){
+
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    });
+
+});
+
+function initMainBanner() {
+    $('#main-slider.carousel').carousel({
+        interval: 8000
+    });
+
+    $('#main-slide.carousel').on('slid.bs.carousel', function () {
+        // do something…
+        applyHeight();
+    });
+
+
+    var slides = $('#slider-home .carousel-inner .item');
+    $.each(slides, function (index, value) {
+        var image = $(this).attr('data-slide');
+        $(this).css('background-image', 'url(' + image + ')');
+
+    });
+
+    if (window.innerWidth > 768) {
+        applyHeight();
+    } else {
+        if (!$('#slider-home').hasClass('fill')) {
+            $('#slider-home').css('height', '500px');
+            $('#slider-home .carousel-inner .item').css('height', '500px');
+        } else {
+            applyHeight();
+        }
+    }
+
+    function applyHeight() {
+
+        console.log("apply height");
+
+        //var navbar_height = $('.navbar-default').height();
+        var navbar_height = 0;
+        var current_height = window.innerHeight;
+
+        var min_height = typeof SLIDER_MIN != "undefined" ? SLIDER_MIN : 820;
+
+        (current_height < min_height) ? (current_height = min_height) : (current_height = current_height);
+
+        console.log("eeeeee");
+        console.log($('#main-text').outerHeight());
+
+        if (current_height < $('#main-text').outerHeight()) {
+            current_height = $('#main-text').outerHeight();
+        }
+
+        $('#slider-home').css('height', current_height - navbar_height);
+        $('#slider-home .carousel-inner .item').css('height', current_height - navbar_height);
+
+        var elem = $('#slider-home').find('#main-text');
+        var offset_from_top = ((current_height / 2) - (elem.height() / 2)) - navbar_height;
+        elem.css('padding-top', offset_from_top);
+
+        if ($('.registration').length) {
+            var top_position = $('.logo-holder').height() + $('.text-holder').height() + offset_from_top;
+            $('.carousel-indicators').css('top', top_position + 70)
+        }
+
+    }
+
+    APPLY_HEIGHT = function() {
+        console.log("apply");
+        applyHeight();
+    };
+
+    $(document).ready(function(){
+        applyHeight();
+
+        setTimeout(function() {
+            applyHeight();
+        }, 100);
+
+        setTimeout(function() {
+            applyHeight();
+        }, 1000);
+    });
+}
+
+$(document).ready(function() {
+    $(document).on("click", ".forgot-link", function(e) {
+        $(".toggle-forms").removeClass("toggled");
+        $(".forgot-form").addClass("toggled");
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    });
+
+    $(document).on("click", ".login-link", function(e) {
+        $(".toggle-forms").removeClass("toggled");
+        $(".sign-form").addClass("toggled");
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    });
+
+    $(document).on("click", ".footer-login", function(e) {
+        $(".toggle-forms").removeClass("toggled");
+        $(".sign-form").addClass("toggled");
+        $("html, body").animate({scrollTop:0}, 400);
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    });
+});
+
+/**
+ * Add param to URL
+ * @param {string} key
+ * @param {string} value
+ * @returns {undefined}
+ */
+function insertParam(key, value)
+{
+    key = encodeURIComponent(key);
+    value = encodeURIComponent(value);
+
+    var s = location.href;
+    var kvp = key + "=" + value;
+
+    var r = new RegExp("(&|\\?)" + key + "=[^\&]*");
+
+    s = s.replace(r, "$1" + kvp);
+
+//    var q = "?";
+//    if(s.indexOf("?") !== -1){
+//        q = '&';
+//    }
+//    if(!RegExp.$1) {s += q   + kvp;};
+    if (!RegExp.$1) {
+        s += (s.length > 0 ? '?' : '&') + kvp;
+    }
+    ;
+
+    console.log(s);
+
+    //again, do what you will here
+    // location.href = s;
+    window.history.pushState("", "", s);
+}
+
+/**
+ * 
+ * @param {jQuery.Event} event
+ * @returns {Boolean}
+ */
+function checkRegistrationPart1(event) {
+
+    /**
+     * Nette validate form for next step
+     */
+    var documentForm = new $('#frm-registerForm');
+    var stepTwo = $('.step-two')[0];
+    $('.step-two').detach();
+    var res = Nette.validateForm(documentForm[0]);
+    documentForm.append(stepTwo);
+
+    if (!res) {
+        event.stopPropagation();
+        event.preventDefault();
+        return false;
+    }
+    return true;
+    
+//    
+//    for (var i = 0; i < document.forms.length; i++) {
+//        documentForm = document.forms[i];
+//        //documentForm.keys()
+//        console.log(documentForm);  
+//        console.log(documentForm.keys());  
+//        break;
+//    }
+//        });
+//        $('#continue, #slide-to-1').click(function () {
+}
+
+$(document).ready(function() {
+    $('.bio-tabs a').click(function(){
+        var box = $(this).closest('.bio');
+        $(box).find('.bio-tabs li').removeClass('active');
+        $(this).parent().addClass('active');
+        $(box).find('.bio-content').removeClass('active');
+        $(box).find('.bio-content'+$(this).attr('href')).addClass('active');
+        return false;
+    });
+});

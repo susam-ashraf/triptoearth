@@ -1,0 +1,200 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Trip;
+use App\User;
+use App\District;
+use Auth;
+use DB;
+use redirect;
+use Validator;
+use Input;
+
+class upload extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    
+
+     public function __construct()
+    {
+        $this->middleware('auth');
+    }
+    public function index()
+    {
+        //
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        //
+    }
+
+
+    /**
+
+     * Create a new controller instance.
+
+     *
+
+     * @return void
+
+     */
+
+    public function imagesUploadPost(Request $request)
+
+    {
+        request()->validate([
+
+          'uploadFile' => 'required',
+
+         ]);
+
+        $user_model=new User();
+        if($request->id)
+        {
+            // find the user.
+             $user_model = $user_model::find($request->id);
+        }
+        
+
+        $file = $request->file('uploadFile');
+
+
+        echo $file->getClientOriginalName();
+        if($file!=null){
+            $filename=time().$file->getClientOriginalName();
+            
+            if($user_model->user_image!=null){
+                 $file= $user_model->user_image;
+                 $filepath = public_path().'/images/profile/'.$file;
+                  \File::delete($filepath);
+            }
+            $request->file('uploadFile')->move('public/images/profile/' , $filename);
+            $user_model->user_image= $filename;
+            
+            $user_model->updated_at=time();
+            $user_model->save();
+        }
+
+
+        // print_r($request->file('uploadFile'));die();
+        
+       // echo $request->file('uploadFile')->getClientOriginalName();
+        // $destinationPath = public_path('/images/profile/');
+        // $image->move($destinationPath, $name);
+        // $user_model->user_image=$name;
+      
+        // $file = $request->file('uploadFile');
+        // if($file!=null){
+        //     $filename = time() . '.' . $file->getClientOriginalName();
+        //     //$fileName = time().$file->getClientOriginalName();
+        //     $request->file('uploadFile')->move('public/images/profile/' , $fileName);
+        //     $user_model->user_image=$fileName;
+        // }
+
+        // $user_model->save();
+
+
+        // $filename = time() . '.' . $data['profile_img']->extension();
+        //         $path = 'uploads/profile_images/' . $filename;
+        //         Image::make($data['profile_img']->getRealPath())->resize(100,100)->save(public_path($path));  
+
+        // request()->validate([
+
+        //     'uploadFile' => 'required',
+
+        // ]);
+
+
+
+        // foreach ($request->file('uploadFile') as $key => $value) {
+
+        //     $imageName = time(). $key . '.' . $value->getClientOriginalExtension();
+
+        //     $value->move(public_path('images'), $imageName);
+
+
+
+
+        // }
+        // 
+        // if ($request->hasFile('image')) {
+        // $image = $request->file('image');
+        // $name = str_slug($request->title).'.'.$image->getClientOriginalExtension();
+        // $destinationPath = public_path('/uploads/articles');
+        // $imagePath = $destinationPath. "/".  $name;
+        // $image->move($destinationPath, $name);
+        // $article->image = $name;
+      // }
+
+     return redirect()->back();
+
+    }
+}

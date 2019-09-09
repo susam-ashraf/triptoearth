@@ -1,0 +1,13 @@
+$(function () {
+   $.nette.init();
+
+   $.nette.ext('ajax', {
+      success: function(payload) {
+         if (payload['snippets']['snippet--paginator'] != undefined) {
+            $(document.body).animate({
+               'scrollTop': $('.latest').offset().top
+            }, 500);
+         }
+      }
+   });
+});

@@ -1,0 +1,155 @@
+<?php
+
+namespace App\Http\Controllers;
+
+//use \Input as Input;
+use Illuminate\Http\Request;
+use App\Trip;
+use App\User;
+use App\District;
+use Auth;
+use DB;
+use redirect;
+use Validator;
+use Input;
+
+
+use DateTime;
+use Carbon\Carbon;
+
+class CreateTrip extends Controller
+{
+
+
+     public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
+
+    public function index()
+    {
+        $data['districts'] =\App\District::get();
+        return view('create_trip.create_trip',['data'=>$data]);
+        
+    }
+    public function home()
+    {
+        return view('front.index');
+    }
+    public function store(Request $request)
+    {
+        // dump($request->all());
+        $trip_model=new Trip();
+        $trip_model->Destination=$request->Destination;
+        $trip_model->find_gender=$request->trip_gender_id;
+        $trip_model->work_and_travel=$request->work_and_travel;
+        $trip_model->type_of_journey=$request->type_of_journey;
+        $trip_model->trip_title=$request->title;
+        $trip_model->first_time_visit=$request->first_visit;
+        $trip_model->accomodation=$request->accomodation;
+        $trip_model->budget=$request->budget_id;
+        $trip_model->room_sharing=$request->room_share;
+        $trip_model->Itinerary=$request->intinerary_id;
+        $trip_model->short_description=$request->description;
+        $trip_model->place_want_to_see=$request->want_to_see;
+        $trip_model->things_want_to_do=$request->things_to_do;
+        $dateToday= $request->from_date;
+        $dateToday = str_replace('/', '-', $dateToday);
+        $newDate = date("Y-m-d", strtotime($dateToday));
+        $trip_model->from_date=$newDate;
+        $dateToday1=$request->to_date;
+        $dateToday1 = str_replace('/', '-', $dateToday1);
+        
+        $newDate1 = date("Y-m-d", strtotime($dateToday1));
+        $trip_model->to_date=$newDate1;
+       
+        // $date=date_create($request->from_date);
+        // echo date_format($date,"Y-m-d ");
+        
+        
+       
+        // $time = strtotime($request->from_date);
+        // $date = getDate($time);
+        // print_r($date);
+
+
+
+        //$dateToday = date("d-m-Y");
+        // $dateToday=$request->from_date;
+        // $newDate = date("Y-m-d", strtotime($dateToday));
+        // echo $newDate;
+
+        // $dateFromDatabase = "2012-12-27";
+       // $reverseDate = date("d-m-Y", strtotime($dateFromDatabase));
+       // 
+        $trip_model->created_at=time();
+        $trip_model->updated_at=time();
+        $trip_model->save();
+        
+       return redirect('/');
+       
+        
+
+    }
+    public function show()
+    {
+
+        
+        $data['trips'] =\App\Trip::get();
+        return view('create_trip.show',['data'=>$data]);
+        
+    }
+    public function myprofile($id)
+    {
+        $data['user'] =DB::table('users')->where('id',$id)->first();
+        $data['districts'] =\App\District::get();
+        return view('profile.my_profile',['data'=>$data]);
+        
+    }
+    public function upload_image_user(Request $request)
+    {
+
+        // return redirect('/');
+     
+        $file = Request::file('image');
+
+        $file = $this->userRepo->updateAvatar($file,Auth::user()->id);
+        
+        return response()->json(['success' => true, 'file' => $file ]);
+  //       if(Input::hasFile('file')){
+		// 	echo 'Uploaded';
+		// 	$file = Input::file('file');
+		// 	$file->move('public/uploads/', $file->getClientOriginalName());
+		// 	echo '';
+		// }
+
+        //$data['user'] =DB::table('users')->where('id',$id)->first();
+       // return view('profile.my_profile',['data'=>$data]);
+        
+        
+
+    }
+
+    public function updateAvatar($file,$id)
+    {
+        // Move the uploaded file to public/uploads/ folder
+        
+        $destinationPath = 'uploads/';
+
+        $filename = $file->getClientOriginalName();
+        
+        $file->move($destinationPath, $filename);
+
+        // save the file path on user avatar
+
+        $user = User::where('id',$user->id)->first();
+
+        $user->avatar = $destinationPath.$filename;
+
+        $user->save();
+
+        return asset($destinationPath.$filename);
+    }
+   
+}
